@@ -1,0 +1,19 @@
+
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "Frontend for the Fullstack Lead Assessment Project",
+  "main": "main.js",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "vue": "^2.6.11",
+    "vue-axios": "^2.1.5"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "~4.5.0"
+  }
+}
