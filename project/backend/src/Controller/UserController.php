@@ -1,29 +1,59 @@
 <?php
 class UserController {
-    private $db;
+    private UserService $service;
 
-    public function __construct($db) {
-        $this->db = $db;
+    public function __construct(UserService $service) {
+        $this->service = $service;
     }
 
     public function getUser($id) {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        try {
+            if (!is_int($id)){
+                throw new Exception("User Id must be a valid number", 400);
+            }
+
+            $result = $this->service->getUserByID($id);
+
+            return $result;
+        } catch (Exception $e) {
+            return array(
+                "error"=>$e->getMessage(),
+                "error_code"=> $e->getCode()
+            );
+        }
     }
 
     public function getUserByEmail($email) {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows === 0) {
-            throw new Exception("No user found with email $email");
-        }
+        try {
+            if (!is_string($email)){
+                throw new Exception("User Id must be a valid string", 400);
+            }
 
-        return $result->fetch_assoc();
+            $result = $this->service->getUserByEmail($email);
+
+            return $result;
+        } catch (Exception $e) {
+            return array(
+                "error"=>$e->getMessage(),
+                "error_code"=> $e->getCode()
+            );
+        }
+    }
+
+    public function getAllUsers($limit, $offset) {
+        try {
+            if (!is_int($limit) || !is_int($offset)){
+                throw new Exception("Limit and Offset must be a valid number", 400);
+            }
+
+            $result = $this->service->getAllUsers($limit, $offset);
+
+            return $result;
+        } catch (Exception $e) {
+            return array(
+                "error"=>$e->getMessage(),
+                "error_code"=> $e->getCode()
+            );
+        }
     }
 }

@@ -6,7 +6,7 @@ require 'Model/User.php';
 // Example usage
 $db = new mysqli('localhost', 'user', 'password', 'database');
 $userService = new UserService($db);
-$userController = new UserController($db);
+$userController = new UserController($userService);
 
 try {
     $user = $userController->getUser(1);
