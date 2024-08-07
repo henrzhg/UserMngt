@@ -60,7 +60,7 @@ class UserService {
             $result = $stmt->get_result();
             
             if ($result->num_rows === 0) {
-                throw new Exception("No user found with email $email", 404);
+                throw new Exception("No user found with email {$email}", 404);
             }
 
             $user = $result->fetch_object();
@@ -68,6 +68,49 @@ class UserService {
             return $user;
 
         } catch (Exception $e) {
+            return array(
+                "error"=>$e->getMessage(),
+                "error_code"=>$e->getCode()
+            );
+        }
+    }
+
+    public function createUser($params) {
+        $this->db->begin_transaction();
+
+        try {
+            $requiredField = 'name,email';
+            $requiredField = explode(',', $requiredField);
+
+            foreach ($requiredField as $key => $value) {
+                if(empty($params[$key])) {
+                    throw new Exception("Field {$key} is required", 400);
+                }
+
+                $value = trim($value);
+                if (!is_string($value)) {
+                    throw new Exception("Field {$key} must be a valid string", 400);
+                }
+
+                $params[$key] = $value;
+            }
+
+            $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ? limit 1");
+            $stmt->bind_param("s", $params["email"]);
+            $stmt->execute();
+            $userExists = $stmt->get_result();
+            if (!empty($userExists)){
+                throw new Exception("Email {$params["email"]} already exists", 400);
+            }
+
+            $stmt = $this->db->prepare("INSERT INTO user(name, email) VALUES (?,?)");
+            $stmt->bind_param("ss", $params["name"], $params["email"]);
+            $stmt->execute();
+
+            $this->db->commit();
+
+        } catch (Exception $e) {
+            $this->db->rollback();
             return array(
                 "error"=>$e->getMessage(),
                 "error_code"=>$e->getCode()
