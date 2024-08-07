@@ -56,4 +56,25 @@ class UserController {
             );
         }
     }
+
+
+    public function createUsers($getBody) {
+        try {
+            if (!is_array($getBody)){
+                throw new Exception("Request body is Invalid", 400);
+            }
+
+            $this->service->createUser($getBody);
+
+            return array(
+                "result"=>"success create user",
+                "error"=>false,
+            );
+        } catch (Exception $e) {
+            return array(
+                "error"=>$e->getMessage(),
+                "error_code"=> $e->getCode()
+            );
+        }
+    }
 }
